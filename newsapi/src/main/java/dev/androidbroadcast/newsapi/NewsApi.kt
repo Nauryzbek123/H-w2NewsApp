@@ -13,6 +13,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.skydoves.retrofit.adapters.result.ResultCallAdapterFactory
+import dev.androidbroadcast.newsapi.utils.TimeApiKeyInterceptor
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -37,20 +38,26 @@ interface NewsApi {
 
     fun NewsApi(
         baseUrl: String,
+        apiKey: String,
         okHttpClient: OkHttpClient? = null,
         json: Json = Json,
     ): NewsApi{
 
-        return  retrofit(baseUrl,okHttpClient,json).create()
+        return  retrofit(baseUrl,apiKey,okHttpClient,json).create()
 
     }
 
     private fun retrofit(
         baseUrl: String,
+        apiKey: String,
         okHttpClient: OkHttpClient? = null ,
         json: Json = Json
     ): Retrofit{
         val jsonConverterFactory = json.asConverterFactory(MediaType.get("application/json"))
+
+         okHttpClient?.newBuilder() ?: OkHttpClient.Builder()
+             .addInterceptor(TimeApiKeyInterceptor(apiKey))
+
         return Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(jsonConverterFactory)
