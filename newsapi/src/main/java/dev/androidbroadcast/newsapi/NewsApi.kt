@@ -55,14 +55,15 @@ interface NewsApi {
     ): Retrofit{
         val jsonConverterFactory = json.asConverterFactory(MediaType.get("application/json"))
 
-         okHttpClient?.newBuilder() ?: OkHttpClient.Builder()
+        val modifiedOkHttpClient: OkHttpClient = (okHttpClient?.newBuilder() ?: OkHttpClient.Builder())
              .addInterceptor(TimeApiKeyInterceptor(apiKey))
+            .build()
 
         return Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(jsonConverterFactory)
             .addCallAdapterFactory(ResultCallAdapterFactory.create())
-            .run { if(okHttpClient != null) client(okHttpClient) else this }
+            .client(modifiedOkHttpClient)
             .build()
     }
 
