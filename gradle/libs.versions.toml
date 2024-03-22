@@ -12,6 +12,8 @@ activityCompose = "1.8.2"
 composeBom = "2024.02.02"
 retrofit = "2.9.0"
 kotlinx-coroutines = "1.8.0"
+retrofitAdaptersResult = "1.0.9"
+retrofitConverterKotlinxSerialization = "1.0.0"
 
 [libraries]
 android-core-ktx = {group ="androidx.core", name = "core-ktx", version.ref = "coreKtx"}
@@ -36,6 +38,9 @@ kotlinx-coroutines-core = {module = "org.jetbrains.kotlinx:kotlinx-coroutines-co
 kotlinx-coroutines-android = {module = "org.jetbrains.kotlinx:kotlinx-coroutines-android",version.ref = "kotlinx-coroutines"}
 
 kotlinx-serialization-json = {module = "org.jetbrains.kotlinx:kotlinx-serialization-json",version.ref = "kotlin-serialization-json"}
+retrofit-adapters-result = { module = "com.github.skydoves:retrofit-adapters-result", version.ref = "retrofitAdaptersResult" }
+retrofit-converter-kotlinx-serialization = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "retrofitConverterKotlinxSerialization" }
+
 
 
 [plugins]
