@@ -17,3 +17,4 @@ rootProject.name = "NewsApp"
 include(":app")
 include(":newsapi")
 include(":database")
+include(":features:news-main")
