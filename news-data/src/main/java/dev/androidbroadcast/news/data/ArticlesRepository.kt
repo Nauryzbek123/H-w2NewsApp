@@ -37,8 +37,7 @@ class ArticlesRepository(
                  }
              }
 
-         return cachedAllArticles.combine(remoteArticles){dbos: RequestResult<Article>,dtos: RequestResult<Article> ->
-
+         return cachedAllArticles.combine(remoteArticles){dbos: RequestResult<List<Article>>,dtos: RequestResult<List<Article>> ->
          }
     }
 
@@ -52,7 +51,7 @@ class ArticlesRepository(
             .map { it.toRequestResult() }
         val start = flowOf<RequestResult<ResponseDTO<ArticleDTO>>>(RequestResult.InProgress())
 
-        return merge<RequestResult<ResponseDTO<ArticleDTO>>>(apiRequest,start)
+        return merge(apiRequest,start)
     }
 
     private suspend fun saveNetResponseToCache(data: List<ArticleDTO>) {
@@ -60,10 +59,13 @@ class ArticlesRepository(
         database.articlesDao.insert(dbos)
     }
 
-    private fun getAllFromDatabase(): Flow<RequestResult.Success<List<ArticleDBO>>> {
-        return database.articlesDao
+    private fun getAllFromDatabase(): Flow<RequestResult<List<ArticleDBO>>> {
+        val dbRequest = database.articlesDao
             .getAll()
             .map { RequestResult.Success(it) }
+        val start = flowOf<RequestResult<List<ArticleDBO>>>(RequestResult.InProgress())
+
+        return merge(start,dbRequest)
     }
 
     suspend fun search(query:String): Flow<Article>{
