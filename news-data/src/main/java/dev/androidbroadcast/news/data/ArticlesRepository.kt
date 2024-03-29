@@ -11,8 +11,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import java.io.IOException
 
@@ -26,24 +28,21 @@ class ArticlesRepository(
 
          var remoteArticles: Flow<RequestResult<*>> = getAllFromServer()
 
-        cachedAllArticles.map {
-
-        }
+        
          return cachedAllArticles.combine(remoteArticles)
     }
 
     private fun getAllFromServer(): Flow<RequestResult<ResponseDTO<ArticleDTO>>> {
-       return flow {
-            emit(RequestResult.InProgress())
-            emit(api.everything())
-        }
-            .map { result: Result<ResponseDTO<ArticleDTO>> -> result.toRequestResult() }
-           .onEach {requestResult: RequestResult<ResponseDTO<ArticleDTO>> ->
-               if (requestResult is RequestResult.Success){
-                   saveNetResponseToCache(checkNotNull(requestResult.data).articles)
-               }
-           }
+        val apiRequest = flow {emit(api.everything()) }
+            .onEach { result ->
+                if (result.isSuccess){
+                    saveNetResponseToCache(checkNotNull(result.getOrThrow()).articles)
+                }
+            }
+            .map { it.toRequestResult() }
+        val start = flowOf<RequestResult<ResponseDTO<ArticleDTO>>>(RequestResult.InProgress())
 
+        return merge<RequestResult<ResponseDTO<ArticleDTO>>>(apiRequest,start)
     }
 
     private suspend fun saveNetResponseToCache(data: List<ArticleDTO>) {
