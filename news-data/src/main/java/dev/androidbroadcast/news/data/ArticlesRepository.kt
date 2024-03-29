@@ -23,15 +23,19 @@ class ArticlesRepository(
     private val api: NewsApi,
 ) {
      fun getAll(): Flow<RequestResult<List<Article>>>{
-         val cachedAllArticles: Flow<RequestResult<List<Article>?>> = getAllFromDatabase()
+         val cachedAllArticles: Flow<RequestResult<List<Article>>> = getAllFromDatabase()
              .map { result ->
                  result.map { articleDbos ->
-                 articleDbos?.map { it.toArticle() }
+                 articleDbos.map { it.toArticle() }
              }
              }
 
-         var remoteArticles = getAllFromServer()
-
+         var remoteArticles: Flow<RequestResult<List<Article>>> = getAllFromServer()
+             .map { result: RequestResult<ResponseDTO<ArticleDTO>> ->
+                 result.map { response ->
+                     response.articles.map { it.toArticle() }
+                 }
+             }
 
          return cachedAllArticles.combine(remoteArticles){dbos: RequestResult<Article>,dtos: RequestResult<Article> ->
 
@@ -70,20 +74,22 @@ class ArticlesRepository(
 
 
 
-sealed class RequestResult<E>(internal val data:E? = null) {
+sealed class RequestResult<out E>(internal val data:E? = null) {
     class  InProgress<E>( data:E? = null): RequestResult<E>(data)
-    class  Success<E>( data:E): RequestResult<E>(data)
-    class Error<E>: RequestResult<E>()
+    class  Success<E: Any>( data:E): RequestResult<E>(data)
+    class Error<E>(data: E? = null): RequestResult<E>()
 }
 
 internal  fun <T: Any> RequestResult<T?>.requireData(): T = checkNotNull(data)
 
-internal  fun <I,O> RequestResult<I>.map(mapper: (I?) -> O): RequestResult<O>{
-    val outData = mapper(data)
+internal  fun <I,O> RequestResult<I>.map(mapper: (I) -> O): RequestResult<O>{
     return when(this){
-        is RequestResult.Success -> RequestResult.Success(outData)
-        is RequestResult.Error -> RequestResult.Error()
-        is RequestResult.InProgress -> RequestResult.InProgress(outData)
+        is RequestResult.Success -> {
+            val outData: O = mapper(checkNotNull(data))
+            RequestResult.Success(checkNotNull(outData))
+        }
+        is RequestResult.Error -> RequestResult.Error(data?.let(mapper))
+        is RequestResult.InProgress -> RequestResult.InProgress(data?.let(mapper))
     }
 }
 
