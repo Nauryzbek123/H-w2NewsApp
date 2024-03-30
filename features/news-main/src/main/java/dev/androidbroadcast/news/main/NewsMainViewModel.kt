@@ -24,7 +24,9 @@ internal class NewsMainViewModel @Inject constructor(
     val state: StateFlow<State> =  getAllArticlesUseCase.get().invoke()
         .map { it.toState() }
         .stateIn(viewModelScope, SharingStarted.Lazily,State.None)
+    fun forceUpdate(){
 
+    }
 
 }
 
