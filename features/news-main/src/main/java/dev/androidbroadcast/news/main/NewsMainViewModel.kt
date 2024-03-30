@@ -6,7 +6,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.androidbroadcast.news.data.ArticlesRepository
 import dev.androidbroadcast.news.data.RequestResult
 import dev.androidbroadcast.news.data.map
-import dev.androidbroadcast.news.data.model.Article
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -30,7 +29,7 @@ internal class NewsMainViewModel @Inject constructor(
 
 }
 
-private fun  RequestResult<List<Article>>.toState(): State {
+private fun  RequestResult<List<ArticleUI>>.toState(): State {
     return when(this){
         is RequestResult.Error -> State.Error()
         is RequestResult.InProgress -> State.Loading(data)
@@ -38,9 +37,9 @@ private fun  RequestResult<List<Article>>.toState(): State {
     }
 }
 
-sealed class State{
+internal sealed class State{
     object None: State()
-    class  Loading(val articles: List<Article>? = null): State()
-    class Error(val articles: List<Article>? = null): State()
-    class Success(val articles: List<Article>) : State()
+    class  Loading(val articles: List<ArticleUI>? = null): State()
+    class Error(val articles: List<ArticleUI>? = null): State()
+    class Success(val articles: List<ArticleUI>) : State()
 }
