@@ -20,6 +20,8 @@ appcompat = "1.6.1"
 material = "1.11.0"
 room = "2.6.1"
 ksp = "1.9.22-1.0.17"
+dagger = "2.50"
+jakarta-inject = "2.0.1"
 
 [libraries]
 android-core-ktx = {group ="androidx.core", name = "core-ktx", version.ref = "coreKtx"}
@@ -53,7 +55,11 @@ retrofit-adapters-result = { module = "com.github.skydoves:retrofit-adapters-res
 retrofit-converter-kotlinx-serialization = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "retrofitConverterKotlinxSerialization" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
-
+dagger-hilt-android = { module = "com.google.dagger:hilt-android", name = "material", version.ref = "dagger" }
+dagger-hilt-compiler = { module = "com.google.dagger:hilt-compiler", name = "material", version.ref = "dagger" }
+dagger-compiler = { module = "com.google.dagger:dagger-compiler", name = "material", version.ref = "dagger" }
+dagger-main = { module = "com.google.dagger:dagger", name = "material", version.ref = "dagger" }
+jakarta-inject = { module = "jakarta.inject:jakarta.inject-api", name = "material", version.ref = "jakarta-inject" }
 
 
 [plugins]
@@ -63,4 +69,7 @@ jetbrainsKotlinJvm = {id = "org.jetbrains.kotlin.jvm",version.ref = "kotlin"}
 kotlinSerialization = {id = "org.jetbrains.kotlin.plugin.serialization",version.ref = "kotlin"}
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "dagger" }
+kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+
 
