@@ -8,21 +8,20 @@ import dev.androidbroadcast.newsapi.models.ArticleDTO
 import dev.androidbroadcast.newsapi.models.ResponseDTO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
-import java.io.IOException
 
 class ArticlesRepository(
     private val database: NewsDatabase,
     private val api: NewsApi,
 ) {
-     fun getAll(): Flow<RequestResult<List<Article>>>{
+     fun getAll(
+        mergeStrategy: MergeStrategy<RequestResult<List<Article>>> = RequestResponseMergeStrategy()
+
+     ): Flow<RequestResult<List<Article>>>{
          val cachedAllArticles: Flow<RequestResult<List<Article>>> = getAllFromDatabase()
              .map { result ->
                  result.map { articleDbos ->
@@ -37,8 +36,7 @@ class ArticlesRepository(
                  }
              }
 
-         return cachedAllArticles.combine(remoteArticles){dbos: RequestResult<List<Article>>,dtos: RequestResult<List<Article>> ->
-         }
+         return cachedAllArticles.combine(remoteArticles,mergeStrategy::merge)
     }
 
     private fun getAllFromServer(): Flow<RequestResult<ResponseDTO<ArticleDTO>>> {
@@ -75,30 +73,3 @@ class ArticlesRepository(
 }
 
 
-
-sealed class RequestResult<out E>(internal val data:E? = null) {
-    class  InProgress<E>( data:E? = null): RequestResult<E>(data)
-    class  Success<E: Any>( data:E): RequestResult<E>(data)
-    class Error<E>(data: E? = null): RequestResult<E>()
-}
-
-internal  fun <T: Any> RequestResult<T?>.requireData(): T = checkNotNull(data)
-
-internal  fun <I,O> RequestResult<I>.map(mapper: (I) -> O): RequestResult<O>{
-    return when(this){
-        is RequestResult.Success -> {
-            val outData: O = mapper(checkNotNull(data))
-            RequestResult.Success(checkNotNull(outData))
-        }
-        is RequestResult.Error -> RequestResult.Error(data?.let(mapper))
-        is RequestResult.InProgress -> RequestResult.InProgress(data?.let(mapper))
-    }
-}
-
-internal fun <T> Result<T>.toRequestResult(): RequestResult<T>{
-    return  when{
-        isSuccess -> RequestResult.Success(getOrThrow())
-        isFailure -> RequestResult.Error()
-        else -> error("Impossible branch")
-    }
-}
