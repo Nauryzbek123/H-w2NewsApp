@@ -2,6 +2,7 @@ package dev.androidbroadcast.news.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.androidbroadcast.news.data.ArticlesRepository
 import dev.androidbroadcast.news.data.RequestResult
 import dev.androidbroadcast.news.data.map
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 import javax.inject.Provider
 
+@HiltViewModel
 internal class NewsMainViewModel @Inject constructor(
      getAllArticlesUseCase: Provider<GetAllArticlesUseCase>,
 ): ViewModel() {
