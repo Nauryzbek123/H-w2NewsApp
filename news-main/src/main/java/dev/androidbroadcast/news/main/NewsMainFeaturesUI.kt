@@ -12,36 +12,132 @@ import androidx.compose.runtime.key
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun NewsMain(){
-    
-    NewsMain(viewModel = viewModel())
+fun NewsMainScreen( ){
+    NewsMainScreen(viewModel = viewModel())
 }
 
+
 @Composable
-internal fun NewsMain(viewModel: NewsMainViewModel){
+internal fun NewsMainScreen(viewModel: NewsMainVIewModel){
     val state by viewModel.state.collectAsState()
-    when(val currentState = state){
-        is State.Success -> Articles(currentState)
-        is State.Error -> TODO()
-        is State.Loading -> TODO()
-        State.None -> TODO()
+    val currentState = state
+    if(state != State.None){
+        NewsMainContent(currentState = currentState)
     }
 }
 
 @Composable
-private fun Articles(state: State.Success){
-    LazyColumn{
-        items(state.articles){article ->
-            key(article.id) {
-               Article(article)
+private fun NewsMainContent(currentState: State){
+    Column {
+        if(currentState is State.Error){
+            ErrorMessage(currentState)
+        }
+        if(currentState is State.Loading){
+            ProgressIndicator(currentState)
+        }
+
+        if(currentState.articles != null){
+            Articles(articles = currentState.articles)
+        }
+
+    }
+}
+
+@Composable
+private fun ErrorMessage(state: State.Error){
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .background(NewsTheme.colorScheme.error)
+            .padding(8.dp), contentAlignment = Alignment.Center
+
+    ){
+        Text(text = "Error during update", color = NewsTheme.colorScheme.onError)
+    }
+}
+
+
+
+@Composable
+private fun ProgressIndicator(state: State.Loading){
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        contentAlignment = Alignment.Center,
+    ){
+        CircularProgressIndicator()
+    }
+}
+
+
+
+
+@Preview
+@Composable
+private fun Articles(
+    @PreviewParameter(ArticlesPreviewProvider::class, limit = 1)articles: List<ArticleUI>,
+){
+    LazyColumn {
+        items(articles){article ->
+            key(article.id){
+                Article(article = article)
             }
         }
     }
 }
+
+
+
+
+
+@Preview
 @Composable
-internal fun Article(article: ArticleUI) {
-    Column {
-        Text(text = article.title, style = MaterialTheme.typography.headlineMedium, maxLines = 1)
-        Text(text = article.description, style = MaterialTheme.typography.bodyMedium, maxLines = 3)
+internal fun Article(
+    @PreviewParameter(ArticlePreviewProvider::class, limit = 1)article: ArticleUI,
+) {
+    Column(modifier = Modifier.padding(8.dp)){
+        Text(
+            text = article.title ?: "No TITLE",
+            style = NewsTheme.typography.headlineMedium,
+            maxLines = 1)
+        Spacer(modifier = Modifier.size(4.dp))
+        Text(text = article.description, style = NewsTheme.typography.bodyMedium, maxLines = 3)
     }
+}
+
+
+
+
+private class ArticlePreviewProvider: PreviewParameterProvider<ArticleUI>{
+    override val values = sequenceOf(
+        ArticleUI(1,"Android Studio Iguana is Stable!",
+            "New stable version on Android IDE has been realized",
+            imageUrl = null,
+            url = "",
+        ),
+
+        ArticleUI(2,"Gemini 1.5 Release!",
+            "Upgraded version of Google AI is available",
+            imageUrl = null,
+            url = "",
+        ),
+
+        ArticleUI(3,"Shape animations (10 min)",
+            "How to use shape transform animations in Compose",
+            imageUrl = null,
+            url = "",
+        ),
+    )
+
+}
+
+private class ArticlesPreviewProvider: PreviewParameterProvider<List<ArticleUI>>{
+
+    private val articleProvider = ArticlePreviewProvider()
+
+    override val values = sequenceOf(
+        articleProvider.values.toList()
+    )
+
 }

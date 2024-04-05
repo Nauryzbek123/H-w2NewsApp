@@ -53,7 +53,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(project(":news-data"))
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
@@ -62,6 +61,8 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
 
     implementation(project(":news-data"))
+    implementation(project(":news-uikit"))
+
 
     implementation(libs.dagger.hilt.android)
     kapt(libs.dagger.hilt.compiler)
