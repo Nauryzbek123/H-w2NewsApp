@@ -74,4 +74,9 @@ dependencies {
     implementation(project(":newsapi"))
     implementation(project(":database"))
     implementation(project(":news-common"))
+    implementation(project(":news-uikit"))
+
+    debugImplementation(libs.okhttp.logging.interceptor)
+
+
 }
