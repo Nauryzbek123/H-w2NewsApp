@@ -4,8 +4,6 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.dagger.hilt.android)
     alias(libs.plugins.kapt)
-
-
 }
 
 android {
@@ -35,12 +33,6 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    buildFeatures {
-        compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
-    }
 }
 
 dependencies {
@@ -56,16 +48,15 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+
     implementation(libs.kotlinx.coroutines.android)
 
     implementation(project(":news-data"))
     implementation(project(":news-uikit"))
 
-
     implementation(libs.dagger.hilt.android)
     kapt(libs.dagger.hilt.compiler)
-
-
 }
